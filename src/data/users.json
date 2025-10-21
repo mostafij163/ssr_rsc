@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "John doe",
+    "occupation": "Engineer",
+    "age": 35,
+    "bio": "10 years of experienced software engineer with working experince on multiple stack"
+  },
+  {
+    "id": 2,
+    "name": "Michel hasi",
+    "occupation": "Sportsman",
+    "age": 35,
+    "bio": "Austrelian left handed batsman! (cricketer)"
+  },
+  {
+    "id": 3,
+    "name": "Doland trump",
+    "occupation": "Businesman",
+    "age": 35,
+    "bio": "President of USA and businessman"
+  }
+]
