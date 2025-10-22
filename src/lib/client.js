@@ -1,17 +1,37 @@
+import { hydrateRoot } from "react-dom/client";
+import { parseJSX } from "../utils/formater.js";
+
+const root = hydrateRoot(document, getInitialClientJSX);
+let currentPathname = window.location.pathname;
+
+function getInitialClientJSX() {
+  const clientJSX = JSON.parse(window.__INITIAL_CLIENT_JSX_STRING__, reviveJSX);
+  return clientJSX;
+}
+
+async function fetchJsx(pathname) {
+  const res = await fetch(pathname + "?jsx=1");
+  const jsxString = await res.text();
+  const jsx = JSON.parse(jsxString, parseJSX);
+
+  return jsx;
+}
+
 async function navigate(pathname) {
-  currentPathname = pathname;
+  const currentPathname = pathname;
   // Fetch HTML for the route we're navigating to.
-  const response = await fetch(pathname);
-  const html = await response.text();
+  const jsx = await fetchJsx(pathname);
 
   if (pathname === currentPathname) {
+    console.log("json string", jsx);
+    root.render(jsx);
     // Get the part of HTML inside the <body> tag.
-    const bodyStartIndex = html.indexOf("<body>") + "<body>".length;
-    const bodyEndIndex = html.lastIndexOf("</body>");
-    const bodyHTML = html.slice(bodyStartIndex, bodyEndIndex);
+    // const bodyStartIndex = html.indexOf("<body>") + "<body>".length;
+    // const bodyEndIndex = html.lastIndexOf("</body>");
+    // const bodyHTML = html.slice(bodyStartIndex, bodyEndIndex);
 
-    // Replace the content on the page.
-    document.body.innerHTML = bodyHTML;
+    // // Replace the content on the page.
+    // document.body.innerHTML = bodyHTML;
   }
 }
 

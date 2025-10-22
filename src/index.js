@@ -1,9 +1,8 @@
 import express from "express";
 import fs from "fs/promises";
-import render from "./lib/render.js";
 import Main from "./components/main.js";
 import UserProfile from "./components/user-profile.js";
-import {sendHtml, sendScript} from "./utils/send-response.js"
+import { sendHtml, sendJSX, sendScript } from "./utils/send-response.js";
 
 const app = express();
 
@@ -14,9 +13,10 @@ app.listen(8080, "localhost", (error) => {
 
 app.get("/users", async (req, res) => {
   try {
-    const users = JSON.parse(await fs.readFile("src/data/users.json", "utf8"));
+    const dataType = req.query.jsx;
 
-    const html = render(
+    const users = JSON.parse(await fs.readFile("src/data/users.json", "utf8"));
+    const jsx = (
       <Main>
         {users.map(({ name, age, occupation, bio, id }) => (
           <UserProfile
@@ -31,7 +31,11 @@ app.get("/users", async (req, res) => {
       </Main>
     );
 
-    sendHtml(res, html)
+    if (dataType) {
+      await sendJSX(res, jsx);
+    } else {
+      await sendHtml(res, jsx);
+    }
   } catch (error) {
     console.log(error);
     res.end(JSON.stringify(error));
@@ -41,6 +45,8 @@ app.get("/users", async (req, res) => {
 app.get("/users/:id", async (req, res) => {
   try {
     const id = req.params.id;
+    const dataType = req.query.jsx;
+
     if (!id) throw new Error("User not found!");
 
     const users = JSON.parse(await fs.readFile("src/data/users.json", "utf8"));
@@ -48,7 +54,7 @@ app.get("/users/:id", async (req, res) => {
 
     if (!user) throw new Error("User not found!");
 
-    const html = render(
+    const jsx = (
       <Main>
         <UserProfile
           name={user.name}
@@ -60,13 +66,23 @@ app.get("/users/:id", async (req, res) => {
       </Main>
     );
 
-    sendHtml(res, html)
+    if (dataType) {
+      await sendJSX(res, jsx);
+    } else {
+      await sendHtml(res, jsx);
+    }
   } catch (error) {
-     console.log(error);
-     res.end(JSON.stringify(error));
+    console.log(error);
+    res.end(JSON.stringify(error));
   }
 });
 
 app.get("/client.js", (req, res) => {
-  sendScript(res, "src/lib/client.js")
+  sendScript(res, "src/lib/client.js");
 });
+
+app.get("/utils/formater.js", (req, res) => {
+  console.log("bal...");
+  sendScript(res, "src/utils/formater.js");
+});
+
